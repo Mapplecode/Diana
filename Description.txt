@@ -1,0 +1,28 @@
+1. I need a scraper (in Phyton) that searches the first 15 sites for a certain keyword (example: what is neem oil or synonymous)
+2. Within each site it searches the title in h2, according to a list of keywords (examples: what is or synonymous), and copies the paragraphs below and stops when the next h2 starts (which will talk about something else). I can choose the number of words that are between the h2: for sample >300. If the keyword and or synonymous aren’t avaliable in sites h2 skip and go to the next one.
+3. Step 2 is repeated for each title in the template.
+4. Copied text is pasted into the corresponding title as you find in the template below
+5. Do not copy from the same site: one title, one site.
+6. Inset a timeout not to be banned from google
+7. The file will be saved in word.
+8. The project will be reusable so I can input keyword and change template (we discuss how to do it). I need the project code.
+
+
+
+Sample:
+In my template there is "Contraindications and side effects".
+For synonymous I mean that someone can write the title h2 like "Contraindications of neem oil" or "Neem oil side effects".
+The program will scrape in H2 keyword I insert "Contraindications, side effect, Risks". If the program find one of this keywords in H2 copy and paste the text in the corresponding title in the template. If find nothing then skip.
+
+
+
+Article template:
+What is Neem Oil?
+Main characteristics: composition and properties of Neem Oil
+How neem oil is made
+Types of Neem Oil
+Uses and Applications: what's the use of Neem Oil
+Contraindications and side effects
+Benefits of Neem Oil
+Where is it possible to buy Neem Oil?
+What is the price of Neem oil?
