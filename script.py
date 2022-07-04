@@ -3,39 +3,44 @@ import requests, urllib.parse
 import re
 from config import *
 import os
+import time
 import aspose.words as aw
 from urllib.error import HTTPError
+import validators
+
 
 match_keyword_for_neem = "Neem"
 
 def click_url(url,data):
     collected = ''
+    response = ''
     try:
         response = requests.get(url,headers=headers).text
     except:
         pass
-    else:
-        print("it's worked")
-        response = requests.get(url,headers=headers).text
-
-    soup = BeautifulSoup(response, 'html.parser')
-    get_len = len(soup.find_all('h2'))
-    if get_len > 0:
-        all_h2_tag = [i.text.lower() for i in soup.find_all('h2')]
-        print(all_h2_tag,"====")
-        for item in all_h2_tag:
-            if data.lower() in item:
-                collected = item
-                paragraph = [i.text for i in soup.find_all("p")]
-                # document_create(collected)
-                # print(paragraph)
+    if validators.url(response):
+        soup = BeautifulSoup(response, 'html.parser')
+        get_len = len(soup.find_all('h2'))
+        try:
+            if get_len > 0:
+                all_h2_tag = [i.text.lower() for i in soup.find_all('h2')]
+                print(all_h2_tag,"====")
+                for item in all_h2_tag:
+                    if data.lower() in item:
+                        collected = item
+                        paragraph = [i.text for i in soup.find_all("p")]
+                        document_create(collected)
+                        print(paragraph)
+                    else:
+                        pass
+                return collected,True
             else:
-                pass
-        return collected,True
+                return "[INFO] Goto next page..", False
+        except Exception as e:
+            print(e)
+            return "[INFO] Goto next page..", False
     else:
         return "[INFO] Goto next page..", False
-
-
 def paginate(url,data ,previous_url=None):
     if url == previous_url: return
     headers = {
@@ -52,10 +57,8 @@ def paginate(url,data ,previous_url=None):
         get_links = link.find('a')
         show_url_list = get_links.get('href')
         print("[INFO] WORKING ON URL : ",show_url_list)
-
+        time.sleep(1)
         datas,status = click_url(show_url_list,data)
-        # print(status,"=+++==")
-        print(datas,"====")
         if status:
             print(datas,end='\n')
         else:
@@ -72,11 +75,16 @@ def paginate(url,data ,previous_url=None):
 def scrape(data):
     text = input('Enter the text that you want to search.......\n')
     pages = paginate('https://google.com/search?q='+text,data)
-    for soup in pages:
-        count_page = int(soup.select_one(".YyVfkd").text)
-        if count_page == 4:
-            break
-
+    if pages:
+        for soup in pages:
+            try:
+                count_page = int(soup.select_one(".YyVfkd").text)
+                if count_page == 4:
+                    break
+            except Exception as e:
+                print(e,soup)
+    else:
+        print(pages)
 
 def document_create(write_file):
     file = 'Neem.docx'
