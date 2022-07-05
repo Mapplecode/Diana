@@ -11,18 +11,18 @@ import validators
 
 match_keyword_for_neem = "Neem"
 
-def click_url(url,data):
+def click_url(url,data,input_length):
     collected = ''
     response = ''
     try:
         response = requests.get(url,headers=headers).text
     except:
         pass
-    if validators.url(response):
+    if validators.url(url) and response != '':
         soup = BeautifulSoup(response, 'html.parser')
         get_len = len(soup.find_all('h2'))
         try:
-            if get_len > 0:
+            if get_len > input_length:
                 all_h2_tag = [i.text.lower() for i in soup.find_all('h2')]
                 print(all_h2_tag,"====")
                 for item in all_h2_tag:
@@ -41,7 +41,7 @@ def click_url(url,data):
             return "[INFO] Goto next page..", False
     else:
         return "[INFO] Goto next page..", False
-def paginate(url,data ,previous_url=None):
+def paginate(url,data ,previous_url=None,input_length=300):
     if url == previous_url: return
     headers = {
         "User-Agent":
@@ -58,7 +58,7 @@ def paginate(url,data ,previous_url=None):
         show_url_list = get_links.get('href')
         print("[INFO] WORKING ON URL : ",show_url_list)
         time.sleep(1)
-        datas,status = click_url(show_url_list,data)
+        datas,status = click_url(show_url_list,data,input_length)
         if status:
             print(datas,end='\n')
         else:
@@ -70,11 +70,16 @@ def paginate(url,data ,previous_url=None):
     next_page_node = soup.select_one('a#pnnext')
     if next_page_node is None: return
     next_page_url = urllib.parse.urljoin('https://www.google.com/',next_page_node['href'])
-    yield from paginate(next_page_url,data, url)
+    yield from paginate(next_page_url,data, url,input_length)
 
 def scrape(data):
     text = input('Enter the text that you want to search.......\n')
-    pages = paginate('https://google.com/search?q='+text,data)
+    length_needed = 300
+    try:
+        length_needed = int(input('Enter h2 length needed'))
+    except:
+        pass
+    pages = paginate('https://google.com/search?q='+text,data,input_length=length_needed)
     if pages:
         for soup in pages:
             try:
