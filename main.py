@@ -28,7 +28,7 @@ def click_url(url,data,input_length,filename,doc):
                     p_tag = ''
                     try:
                         p_tag = tag.findNext('p')
-                        if len(p_tag.text)<=100:
+                        if len(p_tag.text)<=200:
                             p_tag = p_tag.findNext('p')  
                             if p_tag not in [None,'None','']:
                                 GOT_P=True
@@ -80,7 +80,7 @@ def paginate(doc,url,data ,previous_url=None,input_length=300,file_name='file.do
 
 def scrape(get_keyword):
     text = input('Enter the search word that you want \n')
-    print(text,"================")
+    print(text)
     doc = docx.Document()
     file_name = str(text).replace(' ','_').replace('?','')+'.docx'
     length_needed = 300
@@ -93,7 +93,7 @@ def scrape(get_keyword):
         for soup in pages:
             try:
                 count_page = int(soup.select_one(".YyVfkd").text)
-                if count_page == 3:
+                if count_page == 4:
                     break
             except Exception as e:
                 print(e,soup)
@@ -110,8 +110,11 @@ emp_list  = list()
 main_lists = list()
 temp_list = list()
 res = []
-
 newlist = list()
+uni = list()
+final_list = list()
+
+
 main()
 for i in main_lists:
     if i!=None:
@@ -119,21 +122,24 @@ for i in main_lists:
 
 doc = docx.Document()
 
+h2_para = [{"title":i[0].strip().lower(),"paragraph":i[1]}  for i in res]
 
-for i in res:
-    store_it = i[0].strip()
-    if store_it.lower() not in newlist:
-        newlist.append(store_it.lower())
-   
-# print(new)
-    # if i[1].lower not in newlist:
-    #     newlist.append(i[1].lower())
+for item in h2_para:
+    if item.get("title") not in uni:
+        uni.append(item.get("title"))
+        # data = [i.get("paragraph").strip().strip("\n")  for i in h2_para if item.get("title") == i.get("title")]
+        data_list =list()
+        for i in h2_para:
+            if item.get("title") == i.get("title"):
+                data_list.append(i.get("paragraph").strip().strip("\t").strip('\n'))      
+        final_list.append({"h2":item.get("title"),"p":data_list})
+        
 
-    # doc.add_heading(newlist[0])
-    # doc.add_paragraph(newlist[1])    
-    # doc.add_page_break()
-    # doc.save('neem.docx')
+for i in final_list:
+    # doc.add_heading(i.get('h2'),1)
+    doc.add_heading(i.get('h2'),)
 
-
-
+    doc.add_paragraph("\n".join(i.get('p')))   
+    doc.add_page_break()
+    doc.save('final_report.docx')
 
